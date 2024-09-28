@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Tools</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            padding-top: 20px;
+        }
+        #start-button {
+            font-size: 24px;
+            padding: 10px 20px;
+            margin-top: 20px;
+        }
+        #webcam-container {
+            display: none;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #label-container {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div style="font-size: 24px; font-weight: bold; text-decoration: underline; text-align: center;">
+        Electronic Tools
+    </div>
+
+    <button id="start-button" type="button" onclick="start()">Start</button>
+    <div id="webcam-container"></div>
+    <div id="label-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        const URL = "https://teachablemachine.withgoogle.com/models/2O2yWMp3D/";
+        let model, webcam, labelContainer, maxPredictions;
+
+        async function start() {
+            document.getElementById("start-button").style.display = "none";
+            document.getElementById("webcam-container").style.display = "flex";
+
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            try {
+                model = await tmImage.load(modelURL, metadataURL);
+                console.log("โหลดโมเดลสำเร็จ");
+                maxPredictions = model.getTotalClasses();
+
+                const flip = true; // พลิกภาพจากกล้องเว็บแคม
+                webcam = new tmImage.Webcam(200, 200, flip);
+                await webcam.setup();
+                console.log("เว็บแคมถูกตั้งค่าแล้ว");
+                await webcam.play();
+
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                labelContainer = document.getElementById("label-container");
+                if (!labelContainer) {
+                    console.error("ไม่พบ labelContainer ใน DOM");
+                }
+                window.requestAnimationFrame(loop);
+            } catch (error) {
+                console.error("เกิดข้อผิดพลาดในการโหลดโมเดลหรือเว็บแคม:", error);
+                alert("เกิดข้อผิดพลาดในการโหลดโมเดลหรือเว็บแคม กรุณาลองใหม่");
+            }
+        }
+
+        async function predict() {
+            console.log("เริ่มทำการทำนาย...");
+            try {
+                const prediction = await model.predict(webcam.canvas);
+                console.log("ทำนายเสร็จสิ้น:", prediction);
+
+                let highestPrediction = prediction[0];
+                for (let i = 1; i < maxPredictions; i++) {
+                    if (prediction[i].probability > highestPrediction.probability) {
+                        highestPrediction = prediction[i];
+                    }
+                }
+
+                if (highestPrediction && highestPrediction.className) {
+                    labelContainer.innerHTML = highestPrediction.className;
+
+                    let additionalMessage = "";
+/
+
+                    if (highestPrediction.className === "มัลติมิเตอร์") {
+                        additionalMessage = "-->วัดแรงดันไฟฟ้ากระแสตรง กระแสสลับ ปริมาณไฟฟ้ากระแสตรง และความต้านทานไฟฟ้า";
+                    } else if (highestPrediction.className === "คีมปากจิ้งจก") {
+                        additionalMessage = "--> จับ ตัด บิดชิ้นงานหรือปลอกสายไฟ";
+                    } else if (highestPrediction.className === "เทปพันสายไฟ") {
+                        additionalMessage = "--> นำมาพันสายไฟเพื่อเป็นฉนวนป้องกันไฟฟ้าลัดวงจร";
+                    } else if (highestPrediction.className === "ปลั๊กตัวผู้ 2 ขา") {
+                        additionalMessage = "--> ใช้ในการเชื่อมต่อกับแหล่งพลังงานไฟฟ้ากระเเสสลับ";
+                    } else if (highestPrediction.className === "ปลั๊กพ่วง") {
+                        additionalMessage = "--> ต่อพ่วงกับอุปกรณ์ เครื่องมือและเครื่องใช้ไฟฟ้ากับระบบไฟฟ้า";
+                    } else if (highestPrediction.className === "ปลั๊กไฟหุ้มยาง") {
+                        additionalMessage = "--> เชื่อมต่ออุปกรณ์ไฟฟ้ากับแหล่งจ่ายไฟฟ้า โดยมีการออกแบบให้ปลอดภัยและทนทานมากกว่าปลั๊กพลาสติกทั่วไป";
+                    } else if (highestPrediction.className === "สวิตช์หรี่ไฟ") {
+                        additionalMessage = "--> ปรับเพิ่ม-ลดความสว่างของหลอดไฟให้เหมาะสมตามความต้องการใช้งาน";
+                    } else if (highestPrediction.className === "ไขควงวัดไฟ") {
+                        additionalMessage = "--> เป็นอุปกรณ์สำคัญในการตรวจสภาพเครื่องใช้ไฟฟ้า ว่าไฟรั่วหรือไม่";
+                    } else if (highestPrediction.className === "หลอดไฟ LED") {
+                        additionalMessage = "--> แสดงสถานะหรือให้แสงสว่าง";
+                    } else if (highestPrediction.className === "สายเคเบิล") {
+                        additionalMessage = "--> นำไฟฟ้าจากแหล่งจ่ายไปยังอุปกรณ์หรือเครื่องใช้ไฟฟ้าอื่น ๆ";
+                    }
+
+                    labelContainer.innerHTML += "<br>" + additionalMessage;
+                } else {
+                    console.error("ไม่มีการทำนายที่ถูกต้อง");
+                }
+            } catch (error) {
+                console.error("เกิดข้อผิดพลาดในการทำนาย:", error);
+            }
+        }
+
+        function loop() {
+            webcam.update();
+            predict();
+            window.requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>
