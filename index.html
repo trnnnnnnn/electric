@@ -41,12 +41,13 @@
     <div id="label-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    <script type="text/javascript">
+	<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+	<script type="text/javascript">
         const URL = "https://teachablemachine.withgoogle.com/models/PT0ThDUgi/";
         let model, webcam, labelContainer, maxPredictions;
 
         async function start() {
+            console.log("Start button clicked");  // เพิ่มการตรวจสอบว่าเมื่อกดปุ่มแล้วฟังก์ชันทำงาน
             document.getElementById("start-button").style.display = "none";
             document.getElementById("webcam-container").style.display = "flex";
 
@@ -93,10 +94,8 @@
                     labelContainer.innerHTML = highestPrediction.className;
 
                     let additionalMessage = "";
-/
-
                     if (highestPrediction.className === "มัลติมิเตอร์") {
-                        additionalMessage = "-->วัดแรงดันไฟฟ้ากระแสตรง กระแสสลับ ปริมาณไฟฟ้ากระแสตรง และความต้านทานไฟฟ้า";
+                        additionalMessage = "--> วัดแรงดันไฟฟ้ากระแสตรง กระแสสลับ ปริมาณไฟฟ้ากระแสตรง และความต้านทานไฟฟ้า";
                     } else if (highestPrediction.className === "คีมปากจิ้งจก") {
                         additionalMessage = "--> จับ ตัด บิดชิ้นงานหรือปลอกสายไฟ";
                     } else if (highestPrediction.className === "เทปพันสายไฟ") {
@@ -123,6 +122,7 @@
                 }
             } catch (error) {
                 console.error("เกิดข้อผิดพลาดในการทำนาย:", error);
+                alert("เกิดข้อผิดพลาดในการทำนาย กรุณาลองใหม่");
             }
         }
 
