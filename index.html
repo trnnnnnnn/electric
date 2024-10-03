@@ -43,7 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
     <script type="text/javascript">
-        const URL = "https://teachablemachine.withgoogle.com/models/2O2yWMp3D/";
+        const URL = "https://teachablemachine.withgoogle.com/models/PT0ThDUgi/";
         let model, webcam, labelContainer, maxPredictions;
 
         async function start() {
@@ -93,6 +93,7 @@
                     labelContainer.innerHTML = highestPrediction.className;
 
                     let additionalMessage = "";
+/
 
                     if (highestPrediction.className === "มัลติมิเตอร์") {
                         additionalMessage = "-->วัดแรงดันไฟฟ้ากระแสตรง กระแสสลับ ปริมาณไฟฟ้ากระแสตรง และความต้านทานไฟฟ้า";
